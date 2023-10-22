@@ -35,7 +35,7 @@ public class ProductController {
         //@RequestBody 註解 目的為了接住前端傳過來的JSON資料
         //因為我們在ProductRequest (Dto) 去寫上NOTNULL註解去驗證前端的請求參數 ，所以這裡要放@Valid 才會生效
 
-        Integer productId =  productService.createProduct(productRequest);
+        Integer productId = productService.createProduct(productRequest);
 
         Product product = productService.getProductById(productId);
         //上面這段是為了當我成功在資料庫新增商品後，可以根據新增的商品Id用getProductById方法，查詢到這一筆資料
@@ -44,5 +44,50 @@ public class ProductController {
 
     }
 
+    @PutMapping("/products/{productId}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
+                                                                                @RequestBody @Valid ProductRequest productRequest) {
+
+        //先使用productId 嘗試查詢這筆商品數據是否存在 ，如有才修改數據，若沒有就回傳404
+        Product product = productService.getProductById(productId);
+
+        if(product == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+
+        productService.updateProduct(productId,productRequest);
+
+            //修改商品成功後，用這個商品ID取查詢更新後的商品數據
+        Product updateProduct = productService.getProductById(productId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(updateProduct);
+        //這行要放updateProduct才是回傳給前端更新後的商品數據
+
+    }
+
+    @DeleteMapping("/products/{productId}")
+    ResponseEntity<?> deleteProduct(@PathVariable Integer productId){
+
+        Product product = productService.getProductById(productId);
+
+        if ( product == null){
+            String msg = "您要刪除商品不存在";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
+        }else {
+
+            productService.deleteProductById(productId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+
+
+
+
+
+
+
+
+    }
 
 }
