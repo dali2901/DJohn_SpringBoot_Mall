@@ -1,6 +1,7 @@
 package com.djohn.springbootmall.Service;
 
-import com.djohn.springbootmall.Constant.ProductCategory;
+
+import com.djohn.springbootmall.Dto.ProductQueryParams;
 import com.djohn.springbootmall.Dto.ProductRequest;
 import com.djohn.springbootmall.Model.Product;
 
@@ -11,7 +12,7 @@ public interface ProductService {
 
 
 
-    List<Product> getProducts(ProductCategory category,String  search);
+    List<Product> getProducts(ProductQueryParams productQueryParams);
     Product getProductById(Integer productId);
 
 

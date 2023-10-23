@@ -2,6 +2,7 @@ package com.djohn.springbootmall.Dao.Impl;
 
 import com.djohn.springbootmall.Constant.ProductCategory;
 import com.djohn.springbootmall.Dao.ProductDao;
+import com.djohn.springbootmall.Dto.ProductQueryParams;
 import com.djohn.springbootmall.Dto.ProductRequest;
 import com.djohn.springbootmall.Model.Product;
 import com.djohn.springbootmall.RowMapper.ProductRowMapper;
@@ -25,7 +26,7 @@ public class ProductDaoImpl implements ProductDao {
 
 
     @Override
-    public List<Product> getProducts(ProductCategory category, String  search) {
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
 
         String sql = "SELECT product_id, product_name,  category , image_url,  price,  stock, description ," +
                 "created_date, last_modified_date FROM product WHERE 1=1";
@@ -35,15 +36,18 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        if(category != null){
+        if(productQueryParams.getCategory() != null){
             sql =sql +" AND category = :category"; //AND 前面要+空白鍵 ，這樣拼接才不會連在一起
-            map.put("category", category.name());
+            map.put("category", productQueryParams.getCategory().name());
         }
 
-        if( search != null){
+        if( productQueryParams.getSearch() != null){
             sql = sql + " AND product_name LIKE :search";
-            map.put("search", "%"+search+"%");
+            map.put("search", "%"+productQueryParams.getSearch()+"%");
         }
+
+        sql = sql +" ORDER BY " + productQueryParams.getOrderBy() + " "+productQueryParams.getSort();
+        // SPRING JDBC Template  使用 ORDER BY 時 只能用字串拼接的方式，不能用上方  : sql變數的方式
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
