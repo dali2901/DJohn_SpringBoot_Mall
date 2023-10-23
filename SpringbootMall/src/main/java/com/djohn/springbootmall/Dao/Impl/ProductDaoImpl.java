@@ -1,5 +1,6 @@
 package com.djohn.springbootmall.Dao.Impl;
 
+import com.djohn.springbootmall.Constant.ProductCategory;
 import com.djohn.springbootmall.Dao.ProductDao;
 import com.djohn.springbootmall.Dto.ProductRequest;
 import com.djohn.springbootmall.Model.Product;
@@ -21,6 +22,34 @@ public class ProductDaoImpl implements ProductDao {
 
 @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+
+    @Override
+    public List<Product> getProducts(ProductCategory category, String  search) {
+
+        String sql = "SELECT product_id, product_name,  category , image_url,  price,  stock, description ," +
+                "created_date, last_modified_date FROM product WHERE 1=1";
+        // 上方加上一個條件 WHERE 1=1 是 為了彈性的使用下方  "AND category = :category" 這段SQL
+        //若category = null  ，WHERE 1=1 對SQL沒有任何影響 (查全部商品數據)
+        //若category != null，就會變成" WHERE 1=1 +  AND category = :category" 這段SQL ( Enum帶過來的category數據)
+
+        Map<String, Object> map = new HashMap<>();
+
+        if(category != null){
+            sql =sql +" AND category = :category"; //AND 前面要+空白鍵 ，這樣拼接才不會連在一起
+            map.put("category", category.name());
+        }
+
+        if( search != null){
+            sql = sql + " AND product_name LIKE :search";
+            map.put("search", "%"+search+"%");
+        }
+
+        List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
+
+        return productList;
+
+    }
 
     @Override
     public Product getProductById(Integer productId) {
