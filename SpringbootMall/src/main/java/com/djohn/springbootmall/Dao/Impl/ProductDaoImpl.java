@@ -26,16 +26,13 @@ public class ProductDaoImpl implements ProductDao {
 
 
     @Override
-    public List<Product> getProducts(ProductQueryParams productQueryParams) {
+    public Integer countProduct(ProductQueryParams productQueryParams) {
 
-        String sql = "SELECT product_id, product_name,  category , image_url,  price,  stock, description ," +
-                "created_date, last_modified_date FROM product WHERE 1=1";
-        // 上方加上一個條件 WHERE 1=1 是 為了彈性的使用下方  "AND category = :category" 這段SQL
-        //若category = null  ，WHERE 1=1 對SQL沒有任何影響 (查全部商品數據)
-        //若category != null，就會變成" WHERE 1=1 +  AND category = :category" 這段SQL ( Enum帶過來的category數據)
+        String  sql = "SELECT COUNT(*) FROM product WHERE 1=1 ";
 
         Map<String, Object> map = new HashMap<>();
 
+        //--------------------------------查詢條件--------------------------------
         if(productQueryParams.getCategory() != null){
             sql =sql +" AND category = :category"; //AND 前面要+空白鍵 ，這樣拼接才不會連在一起
             map.put("category", productQueryParams.getCategory().name());
@@ -46,8 +43,46 @@ public class ProductDaoImpl implements ProductDao {
             map.put("search", "%"+productQueryParams.getSearch()+"%");
         }
 
+        Integer total = namedParameterJdbcTemplate.queryForObject(sql,map,Integer.class);
+
+        return total;
+    }
+
+    @Override
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
+
+        String sql = "SELECT product_id, product_name,  category , image_url,  price,  stock, description ," +
+                "created_date, last_modified_date FROM product WHERE 1=1";
+        // 上方加上一個條件 WHERE 1=1 是 為了彈性的使用下方  "AND category = :category" 這段SQL
+        //若category = null  ，WHERE 1=1 對SQL沒有任何影響 (查全部商品數據)
+        //若category != null，就會變成" WHERE 1=1 +  AND category = :category" 這段SQL ( Enum帶過來的category數據)
+
+        Map<String, Object> map = new HashMap<>();
+
+        //--------------------------------查詢條件--------------------------------
+        if(productQueryParams.getCategory() != null){
+            sql =sql +" AND category = :category"; //AND 前面要+空白鍵 ，這樣拼接才不會連在一起
+            map.put("category", productQueryParams.getCategory().name());
+        }
+
+        if( productQueryParams.getSearch() != null){
+            sql = sql + " AND product_name LIKE :search";
+            map.put("search", "%"+productQueryParams.getSearch()+"%");
+        }
+
+
+        //--------------------------------排序--------------------------------
         sql = sql +" ORDER BY " + productQueryParams.getOrderBy() + " "+productQueryParams.getSort();
         // SPRING JDBC Template  使用 ORDER BY 時 只能用字串拼接的方式，不能用上方  : sql變數的方式
+
+
+
+        //--------------------------------分頁--------------------------------
+        //LIMIT跟OFFSET會接在 ORDER BY的語句後面
+        sql = sql +" LIMIT :limit OFFSET :offset";
+        map.put("limit",productQueryParams.getLimit());
+        map.put("offset",productQueryParams.getOffset());
+
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
