@@ -32,16 +32,9 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        //--------------------------------查詢條件--------------------------------
-        if(productQueryParams.getCategory() != null){
-            sql =sql +" AND category = :category"; //AND 前面要+空白鍵 ，這樣拼接才不會連在一起
-            map.put("category", productQueryParams.getCategory().name());
-        }
+        //--------------------------------查詢條件--------------------------------(提煉出來，當每次需要拼接sql語句時拜託addFilteringSql方法去拼接)
 
-        if( productQueryParams.getSearch() != null){
-            sql = sql + " AND product_name LIKE :search";
-            map.put("search", "%"+productQueryParams.getSearch()+"%");
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql,map,Integer.class);
 
@@ -59,16 +52,8 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        //--------------------------------查詢條件--------------------------------
-        if(productQueryParams.getCategory() != null){
-            sql =sql +" AND category = :category"; //AND 前面要+空白鍵 ，這樣拼接才不會連在一起
-            map.put("category", productQueryParams.getCategory().name());
-        }
-
-        if( productQueryParams.getSearch() != null){
-            sql = sql + " AND product_name LIKE :search";
-            map.put("search", "%"+productQueryParams.getSearch()+"%");
-        }
+        //--------------------------------查詢條件--------------------------------  (提煉出來，當每次需要拼接sql語句時拜託addFilteringSql方法去拼接)
+        sql = addFilteringSql(sql, map, productQueryParams);
 
 
         //--------------------------------排序--------------------------------
@@ -174,4 +159,27 @@ public class ProductDaoImpl implements ProductDao {
 
         namedParameterJdbcTemplate.update(sql,map);
     }
+
+
+    private  String addFilteringSql(String sql , Map<String, Object> map, ProductQueryParams productQueryParams){
+
+        //註 : 這個方法本來寫在 countProduc 跟 getProducts 裡面 但因為重複
+        // 我們要將他提煉出來，使他能重複使用 並且提高維護性
+
+
+        //--------------------------------查詢條件--------------------------------
+        if(productQueryParams.getCategory() != null){
+            sql =sql +" AND category = :category"; //AND 前面要+空白鍵 ，這樣拼接才不會連在一起
+            map.put("category", productQueryParams.getCategory().name());
+        }
+
+        if( productQueryParams.getSearch() != null){
+            sql = sql + " AND product_name LIKE :search";
+            map.put("search", "%"+productQueryParams.getSearch()+"%");
+        }
+
+        return  sql;
+    }
+
+
 }
