@@ -1,12 +1,20 @@
 package com.djohn.springbootmall.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 
 public class User {
 
 
     private Integer userId;
-    private  String email;
+
+    //    @JsonProperty("e_mail")
+    //下這個註解後當Springboot 將 User Class 轉換成JSON格式給前端時，顯示的JSON Key 就會是 e_mail
+    private String email;
+
+    @JsonIgnore
     private String password;
     private Date createdDate;
     private Date lastModifiedDate;
