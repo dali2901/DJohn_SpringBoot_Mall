@@ -39,7 +39,7 @@ public class ProductController {
         @RequestParam (defaultValue = "0") @Min(0) Integer offset  //跳過幾筆數據
                                                                                     ){
 //要使前端能夠依照URL輸入的category參數(CAR或FOOD)來當條件尋找商品，我們要把category送到Dao層，讓他根據category使用SQL語法尋找
-// 並且帶上(required = false) 因為前段可以選擇要不要帶上category參數過來(有可能使用者不想分類而是想找全部商品)
+// 並且帶上(required = false) 因為前端可以選擇要不要帶上category參數過來(有可能使用者不想分類而是想找全部商品)
 
 //拿創建日期當作 defaultValue 因為通常會希望新的商品在最前面 (預設的條件的概念)
 //拿desc當作 defaultValue 進行由大到小的排序
