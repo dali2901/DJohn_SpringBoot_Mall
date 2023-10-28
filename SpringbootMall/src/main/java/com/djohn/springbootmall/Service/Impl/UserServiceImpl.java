@@ -2,6 +2,7 @@ package com.djohn.springbootmall.Service.Impl;
 
 
 import com.djohn.springbootmall.Dao.UserDao;
+import com.djohn.springbootmall.Dto.UserLoginRequest;
 import com.djohn.springbootmall.Dto.UserRegisterRequest;
 import com.djohn.springbootmall.Model.User;
 import com.djohn.springbootmall.Service.UserService;
@@ -42,5 +43,31 @@ public class UserServiceImpl implements UserService {
 
         //創建帳號
         return userDao.createUser(userRegisterRequest);
+    }
+
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+
+
+        //「登入」 這個方法 就是要去檢查說 使用者登入的這個信箱跟密碼 與資料庫的數據是不是完全一致
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());  //根據前端傳過來的Email 查詢該筆數據出來
+
+
+        if(user == null){
+            //如果user這個Object是空的 那就是代表沒有註冊
+            log.warn("該Email {} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if(user.getPassword().equals(userLoginRequest.getPassword())){
+
+            //如果資料庫這個user所拿到的 password的值 等於 前端傳過來的 password的值 那就代表通過
+            return user;
+        }else {
+            log.warn("email {} 密碼不正確",userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
