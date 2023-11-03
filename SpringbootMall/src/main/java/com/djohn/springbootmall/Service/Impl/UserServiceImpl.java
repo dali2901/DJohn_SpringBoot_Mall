@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
@@ -41,6 +42,13 @@ public class UserServiceImpl implements UserService {
            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST);
        }
 
+       //使用 MD5 生成 密碼的雜湊值
+       String hashedPassword = DigestUtils.md5DigestAsHex(userRegisterRequest.getPassword().getBytes());
+       //記得要加getBytes()方法，才能將字串轉換成Byte類型
+
+        userRegisterRequest.setPassword(hashedPassword);
+
+
         //創建帳號
         return userDao.createUser(userRegisterRequest);
     }
@@ -53,15 +61,17 @@ public class UserServiceImpl implements UserService {
         //「登入」 這個方法 就是要去檢查說 使用者登入的這個信箱跟密碼 與資料庫的數據是不是完全一致
         User user = userDao.getUserByEmail(userLoginRequest.getEmail());  //根據前端傳過來的Email 查詢該筆數據出來
 
-
+        //先檢查User是否存在
         if(user == null){
             //如果user這個Object是空的 那就是代表沒有註冊
             log.warn("該Email {} 尚未註冊", userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        if(user.getPassword().equals(userLoginRequest.getPassword())){
+        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
 
+        //下方比較密碼
+        if(user.getPassword().equals(hashedPassword)){
             //如果資料庫這個user所拿到的 password的值 等於 前端傳過來的 password的值 那就代表通過
             return user;
         }else {
