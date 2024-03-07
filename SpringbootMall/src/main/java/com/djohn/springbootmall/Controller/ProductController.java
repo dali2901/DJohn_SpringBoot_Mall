@@ -7,31 +7,40 @@ import com.djohn.springbootmall.Dto.ProductRequest;
 import com.djohn.springbootmall.Model.Product;
 import com.djohn.springbootmall.Service.ProductService;
 import com.djohn.springbootmall.util.Page;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
+import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @Validated
 @RestController
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
 
-@GetMapping("/products")
+    private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @GetMapping("/products")
     public ResponseEntity<Page<Product>> getProducts(
         // 查詢條件 Filtering
         @RequestParam(required = false) ProductCategory category,
         @RequestParam(required = false) String search,
-        //  排序  Sorting
+        //  排序  Sorting （控制商品排序）
         @RequestParam (defaultValue = "created_date")String orderBy,
         @RequestParam  (defaultValue = "desc")String sort,
         //  排序  Pagination

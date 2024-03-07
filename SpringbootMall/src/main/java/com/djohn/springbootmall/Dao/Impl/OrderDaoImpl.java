@@ -2,6 +2,7 @@ package com.djohn.springbootmall.Dao.Impl;
 
 
 import com.djohn.springbootmall.Dao.OrderDao;
+import com.djohn.springbootmall.Dto.OrderQueryParams;
 import com.djohn.springbootmall.Model.Order;
 import com.djohn.springbootmall.Model.OrderItem;
 import com.djohn.springbootmall.RowMapper.OrderItemRowMapper;
@@ -24,6 +25,38 @@ public class OrderDaoImpl implements OrderDao {
 
     public OrderDaoImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    }
+
+    @Override
+    public Integer countOrder(OrderQueryParams orderQueryParams) {
+        String sql = "SELECT count(*) FROM `order` WHERE 1=1";
+
+        Map<String, Object> map = new HashMap<>();
+        //查詢條件
+        sql = addFilteringSql(sql, map, orderQueryParams);
+
+        return namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class); //回傳給前端整數類型的變數total
+    }
+
+    @Override
+    public List<Order> getOrders(OrderQueryParams orderQueryParams) {
+        String sql = "SELECT order_id, user_id, total_amount, created_date, last_modified_date FROM `order` WHERE 1=1";
+
+        Map<String, Object> map = new HashMap<>();
+
+        //查詢條件
+        sql = addFilteringSql(sql, map, orderQueryParams);
+
+        //排序 (此處這樣寫是因為希望新的訂單排最前面, 舊的訂單排較後面）(這邊寫死因為不希望前端能去改變訂單排序）
+        sql = sql + "ORDER BY created_date DESC";
+
+        //分頁
+        sql = sql + "LIMIT :limit OFFSET :offset";
+        map.put("limit", orderQueryParams.getLimit());
+        map.put("offset", orderQueryParams.getOffset());
+
+        List<Order> orderList = namedParameterJdbcTemplate.query(sql, map, new OrderRowMapper());
+        return orderList;
     }
 
     @Override
@@ -114,5 +147,13 @@ public class OrderDaoImpl implements OrderDao {
         }
 
         namedParameterJdbcTemplate.batchUpdate(sql, parameterSources);
+    }
+
+    private String addFilteringSql(String sql, Map<String, Object> map, OrderQueryParams orderQueryParams){
+        if (orderQueryParams.getUserId() != null){
+            sql = sql + "AND user_id = :userId";
+            map.put("userId", orderQueryParams.getUserId());
+        }
+        return sql;
     }
 }

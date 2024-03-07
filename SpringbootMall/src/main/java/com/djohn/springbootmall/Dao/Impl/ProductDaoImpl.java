@@ -1,30 +1,26 @@
 package com.djohn.springbootmall.Dao.Impl;
 
-import com.djohn.springbootmall.Constant.ProductCategory;
 import com.djohn.springbootmall.Dao.ProductDao;
 import com.djohn.springbootmall.Dto.ProductQueryParams;
 import com.djohn.springbootmall.Dto.ProductRequest;
 import com.djohn.springbootmall.Model.Product;
 import com.djohn.springbootmall.RowMapper.ProductRowMapper;
-import javax.print.attribute.standard.JobKOctets;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Component
 public class ProductDaoImpl implements ProductDao {
-
-@Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    public ProductDaoImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    }
 
     @Override
     public Integer countProduct(ProductQueryParams productQueryParams) {
@@ -119,9 +115,9 @@ public class ProductDaoImpl implements ProductDao {
 
         namedParameterJdbcTemplate.update(sql,new MapSqlParameterSource(map), keyHolder);
 
-        int prodcutId = keyHolder.getKey().intValue();
+        int productId = keyHolder.getKey().intValue();
 
-        return prodcutId;
+        return productId;
     }
 
 
@@ -176,7 +172,7 @@ public class ProductDaoImpl implements ProductDao {
 
     private  String addFilteringSql(String sql , Map<String, Object> map, ProductQueryParams productQueryParams){
 
-        //註 : 這個方法本來寫在 countProduc 跟 getProducts 裡面 但因為重複
+        //註 : 這個方法本來寫在 countProduct 跟 getProducts 裡面 但因為重複
         // 我們要將他提煉出來，使他能重複使用 並且提高維護性
 
 
@@ -187,7 +183,7 @@ public class ProductDaoImpl implements ProductDao {
         }
 
         if( productQueryParams.getSearch() != null){
-            sql = sql + " AND product_name LIKE :search";
+            sql = sql + " AND product_name LIKE :search"; //AND 前面要+空白鍵 ，這樣拼接才不會連在一起
             map.put("search", "%"+productQueryParams.getSearch()+"%");
         }
 
