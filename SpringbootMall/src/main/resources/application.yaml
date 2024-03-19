@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    #配置多個DataSource
+    primary:
+      type: com.mysql.cj.jdbc.MysqlConnectionPoolDataSource
+      username: root
+      password: root
+      jdbc-url: jdbc:mysql://localhost:3306/djohnmall?serverTimezone=Asia/Taipei&characterEncoding=utf-8&allowMultiQueries=true&autoReconnect=true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+    second:
+      type: com.mysql.cj.jdbc.MysqlConnectionPoolDataSource
+      username: root
+      password: root
+      jdbc-url: jdbc:mysql://localhost:3306/mallsecurity?serverTimezone=Asia/Taipei&characterEncoding=utf-8&allowMultiQueries=true&autoReconnect=true
+      driver-class-name: com.mysql.cj.jdbc.Driver

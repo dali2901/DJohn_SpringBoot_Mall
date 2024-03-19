@@ -1,10 +1,10 @@
 package com.djohn.springbootmall.Dto;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public class BuyItem {
     @NotNull
-    private  Integer productId;
+    private Integer productId;
     @NotNull
     private Integer quantity;
 

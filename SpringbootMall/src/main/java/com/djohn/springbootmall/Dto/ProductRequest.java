@@ -1,15 +1,13 @@
 package com.djohn.springbootmall.Dto;
 
 import com.djohn.springbootmall.Constant.ProductCategory;
-import org.springframework.lang.NonNull;
-
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 //決定前端要傳的參數  id 資料庫會自動生成，DATE型態資料讓SPRINGBOOT程式去設定
 
 public class ProductRequest {
 
-@NotNull
+    @NotNull
     private String productName;
     @NotNull
     private ProductCategory category;

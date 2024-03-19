@@ -1,6 +1,6 @@
 package com.djohn.springbootmall.Dto;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 public class CreateOrderRequest {

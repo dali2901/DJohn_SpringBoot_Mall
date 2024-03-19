@@ -16,23 +16,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class OrderServiceImpl implements OrderService {
 
-    private final  static Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
-
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
+    private final OrderDao orderDao;
+    private final ProductDao productDao;
     private final UserDao userDao;
 
-    private final OrderDao orderDao;
-
-    private final ProductDao productDao;
-
-    public OrderServiceImpl(OrderDao orderDao, ProductDao productDao,UserDao userDao) {
+    public OrderServiceImpl(OrderDao orderDao, ProductDao productDao, UserDao userDao) {
         this.orderDao = orderDao;
         this.productDao = productDao;
         this.userDao = userDao;
@@ -44,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
 
         User user = userDao.getUserById(userId);
 
-        if (user == null){
+        if (user == null) {
             log.warn("該 userId {} 不存在", userId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -57,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
             Product product = productDao.getProductById(buyItem.getProductId());
 
             //檢查product商品是否存在、庫存數否足夠
-            if(product == null){
+            if (product == null) {
                 log.warn("商品 {} 不存在", buyItem.getProductId());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             } else if (product.getStock() < buyItem.getQuantity()) {
@@ -105,11 +102,10 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getOrders(OrderQueryParams orderQueryParams) {
         List<Order> orderList = orderDao.getOrders(orderQueryParams);
 
-        for(Order order : orderList){
+        for (Order order : orderList) {
             List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId(order.getOrderId());
             order.setOrderItemList(orderItemList);
         }
-
         return orderList;
     }
 }
