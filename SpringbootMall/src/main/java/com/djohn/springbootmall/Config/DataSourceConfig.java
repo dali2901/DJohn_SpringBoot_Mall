@@ -10,18 +10,18 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class DataSourceConfig {
-    @Bean(name = "primaryDataSource")
-    @Qualifier("primaryDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.primary")
-    @Primary
-    public DataSource primaryDataSource(){
+    @Bean(name = "djohnmallDataSource")
+    @Qualifier("djohnmallDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.djohnmall")
+    public DataSource djohnmallDataSource(){
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "secondDataSource")
-    @Qualifier("secondDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.second")
-    public DataSource secondDataSource(){
+    @Bean(name = "mallsecurityDataSource")
+    @Qualifier("mallsecurityDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.mallsecurity")
+    @Primary
+    public DataSource mallsecurityDataSource(){
         return DataSourceBuilder.create().build();
     }
 }

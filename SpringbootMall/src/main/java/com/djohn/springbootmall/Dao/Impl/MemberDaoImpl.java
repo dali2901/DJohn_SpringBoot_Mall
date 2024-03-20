@@ -13,12 +13,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class MemberDaoImpl implements MemberDao {
 
+    //@Autowired 默認按照該''類型''裝配 如果想要使用名稱裝配可以結合@Qualifier註解
+    //@Resource 默認按照''名稱''裝配, 名稱可以通過name屬性進行指定 如果沒有指定name屬性 當註解寫在自段上時
+    //  默認取自段名稱進行名稱查找
     @Resource
-    private final NamedParameterJdbcTemplate secondJdbcTemplate;
+    private final NamedParameterJdbcTemplate mallsecurityJdbcTemplate;
     private final MemberRowMapper memberRowMapper;
 
-    public MemberDaoImpl(NamedParameterJdbcTemplate secondJdbcTemplate, MemberRowMapper memberRowMapper) {
-        this.secondJdbcTemplate = secondJdbcTemplate;
+    public MemberDaoImpl(NamedParameterJdbcTemplate mallsecurityJdbcTemplate, MemberRowMapper memberRowMapper) {
+        this.mallsecurityJdbcTemplate = mallsecurityJdbcTemplate;
         this.memberRowMapper = memberRowMapper;
     }
 
@@ -29,7 +32,7 @@ public class MemberDaoImpl implements MemberDao {
         Map<String, Object> map = new HashMap<>();
         map.put("memberId", memberId);
 
-        List<Member> memberList =secondJdbcTemplate.query(sql, map, memberRowMapper);
+        List<Member> memberList =mallsecurityJdbcTemplate.query(sql, map, memberRowMapper);
 
         if (memberList.size() > 0) {
             return memberList.get(0);
@@ -45,7 +48,7 @@ public class MemberDaoImpl implements MemberDao {
         Map<String, Object> map = new HashMap<>();
         map.put("email", email);
 
-        List<Member> memberList = secondJdbcTemplate.query(sql, map, memberRowMapper);
+        List<Member> memberList = mallsecurityJdbcTemplate.query(sql, map, memberRowMapper);
 
         if (memberList.size() > 0) {
             return memberList.get(0);

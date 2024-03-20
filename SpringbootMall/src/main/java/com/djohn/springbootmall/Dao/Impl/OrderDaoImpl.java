@@ -7,6 +7,7 @@ import com.djohn.springbootmall.Model.Order;
 import com.djohn.springbootmall.Model.OrderItem;
 import com.djohn.springbootmall.RowMapper.OrderItemRowMapper;
 import com.djohn.springbootmall.RowMapper.OrderRowMapper;
+import jakarta.annotation.Resource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -21,10 +22,11 @@ import java.util.Map;
 @Component
 public class OrderDaoImpl implements OrderDao {
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @Resource
+    private final NamedParameterJdbcTemplate testIfMatchJdbcTemplate;
 
-    public OrderDaoImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    public OrderDaoImpl(NamedParameterJdbcTemplate testIfMatchJdbcTemplate) {
+        this.testIfMatchJdbcTemplate = testIfMatchJdbcTemplate;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class OrderDaoImpl implements OrderDao {
         //查詢條件
         sql = addFilteringSql(sql, map, orderQueryParams);
 
-        return namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class); //回傳給前端整數類型的變數total
+        return testIfMatchJdbcTemplate.queryForObject(sql, map, Integer.class); //回傳給前端整數類型的變數total
     }
 
     @Override
@@ -48,14 +50,14 @@ public class OrderDaoImpl implements OrderDao {
         sql = addFilteringSql(sql, map, orderQueryParams);
 
         //排序 (此處這樣寫是因為希望新的訂單排最前面, 舊的訂單排較後面）(這邊寫死因為不希望前端能去改變訂單排序）
-        sql = sql + "ORDER BY created_date DESC";
+        sql = sql + " ORDER BY created_date DESC";
 
         //分頁
-        sql = sql + "LIMIT :limit OFFSET :offset";
+        sql = sql + " LIMIT :limit OFFSET :offset";
         map.put("limit", orderQueryParams.getLimit());
         map.put("offset", orderQueryParams.getOffset());
 
-        List<Order> orderList = namedParameterJdbcTemplate.query(sql, map, new OrderRowMapper());
+        List<Order> orderList = testIfMatchJdbcTemplate.query(sql, map, new OrderRowMapper());
         return orderList;
     }
 
@@ -67,7 +69,7 @@ public class OrderDaoImpl implements OrderDao {
         Map<String, Object> map = new HashMap<>();
         map.put("orderId", orderId);
 
-        List<Order> orderList = namedParameterJdbcTemplate.query(sql, map, new OrderRowMapper());
+        List<Order> orderList = testIfMatchJdbcTemplate.query(sql, map, new OrderRowMapper());
 
         if (!orderList.isEmpty()) {
             return orderList.get(0);
@@ -86,7 +88,7 @@ public class OrderDaoImpl implements OrderDao {
         Map<String, Object> map = new HashMap<>();
         map.put("orderId", orderId);
 
-        List<OrderItem> orderItemList = namedParameterJdbcTemplate.query(sql, map, new OrderItemRowMapper());
+        List<OrderItem> orderItemList = testIfMatchJdbcTemplate.query(sql, map, new OrderItemRowMapper());
 
         return orderItemList;
     }
@@ -105,7 +107,7 @@ public class OrderDaoImpl implements OrderDao {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(map), keyHolder);
+        testIfMatchJdbcTemplate.update(sql, new MapSqlParameterSource(map), keyHolder);
 
         int orderId = keyHolder.getKey().intValue();
         return orderId;
@@ -126,7 +128,7 @@ public class OrderDaoImpl implements OrderDao {
 //            map.put("quantity", orderItem.getQuantity());
 //            map.put("amount", orderItem.getAmount());
 //
-//            namedParameterJdbcTemplate.update(sql, map);
+//            testIfMatchJdbcTemplate.update(sql, map);
 //        }
 
         // 使用 batchUpdate 一次性加入數據
@@ -146,12 +148,12 @@ public class OrderDaoImpl implements OrderDao {
             parameterSources[i].addValue("amount", orderItem.getAmount());
         }
 
-        namedParameterJdbcTemplate.batchUpdate(sql, parameterSources);
+        testIfMatchJdbcTemplate.batchUpdate(sql, parameterSources);
     }
 
     private String addFilteringSql(String sql, Map<String, Object> map, OrderQueryParams orderQueryParams){
         if (orderQueryParams.getUserId() != null){
-            sql = sql + "AND user_id = :userId";
+            sql = sql + " AND user_id = :userId";
             map.put("userId", orderQueryParams.getUserId());
         }
         return sql;

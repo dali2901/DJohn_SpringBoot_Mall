@@ -13,14 +13,14 @@ public class JdbcTemplateConfig {
 
 
     //因為希望是使用  NamedParameterJdbcTemplate
-    @Primary
-    @Bean(name = "primaryJdbcTemplate")
-    public NamedParameterJdbcTemplate primaryJdbcTemplate(@Qualifier("primaryDataSource") DataSource dataSource){
+
+    @Bean(name = "testIfMatchJdbcTemplate") //這邊名稱打這樣 但daot曾還是可以吃到不知道為什麼>?????
+    public NamedParameterJdbcTemplate djohnmallJdbcTemplate(@Qualifier("djohnmallDataSource") DataSource dataSource){
         return new NamedParameterJdbcTemplate(dataSource);
     }
-
-    @Bean(name = "secondJdbcTemplate")
-    public NamedParameterJdbcTemplate secondJdbcTemplate(@Qualifier("secondDataSource") DataSource dataSource) {
+    @Primary
+    @Bean(name = "mallsecurityJdbcTemplate")
+    public NamedParameterJdbcTemplate mallsecurityJdbcTemplate(@Qualifier("mallsecurityDataSource") DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
     }
 }
