@@ -10,31 +10,34 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return NoOpPasswordEncoder.getInstance();
-//    return new BCryptPasswordEncoder();
-  }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+//    return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
+    }
 
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    return http
-      .csrf(csrf -> csrf.disable())
-      .httpBasic(Customizer.withDefaults())
-      .formLogin(Customizer.withDefaults())
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -> csrf.disable())
+            .httpBasic(Customizer.withDefaults())
+            .formLogin(Customizer.withDefaults())
 
-      .authorizeHttpRequests(request -> request
-        .requestMatchers("/register").permitAll()
-        .anyRequest().authenticated() // deny by default 原則  避免意外暴露風險
-      )
+            .authorizeHttpRequests(request -> request
+                .requestMatchers("/register").permitAll()
+                .requestMatchers("/login").hasRole("ADMIN")
+                .anyRequest().authenticated() // deny by default 原則  避免意外暴露風險
+            )
 
-      .build();
-  }
+            .addFilterBefore(new MallFilter01(), BasicAuthenticationFilter.class)
+            .build();
+    }
 
 //  @Bean
 //  public InMemoryUserDetailsManager userDetailsManager(){

@@ -3,6 +3,8 @@ package com.djohn.springbootmall.Controller;
 import com.djohn.springbootmall.Dao.MemberDao;
 import com.djohn.springbootmall.Model.Member;
 import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,8 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+
+
 @RestController
 public class MemberController {
+
+    Logger logger = LoggerFactory.getLogger(getClass());
 
   private final MemberDao memberDao;
   private final PasswordEncoder passwordEncoder;
@@ -33,6 +39,9 @@ public class MemberController {
     //在DB插入member數據
     Integer memberId = memberDao.createMember(member);
 
+      logger.info("成功進到MemberController裡面的register方法囉，參數member= {} memberId = {}"  ,member, memberId);
+
+
     return memberDao.getMemberById(memberId);
   }
 
@@ -42,8 +51,10 @@ public class MemberController {
     //取得使用者的帳號
     String username = authentication.getName();
 
+      logger.info("成功進到MemberController裡面的Login方法囉，參數authentication= {}" , authentication);
+
     //取得使用者的權限
     Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-    return "Hello" + username + ", Welcome to Mall";
+    return "Hello" + username + ", Welcome to Mall, Your authorities is " + authorities;
   }
 }
